@@ -71,11 +71,16 @@ type MessageStruct struct {
 
 func processMessage(c chan MessageStruct) {
 	for m := range c {
-		c1, _ := GetFromMap(m.From)
+		c1, ok := GetFromMap(m.From)
+		if !ok {
+			continue
+		}
 		c2, ok := GetFromMap(m.To)
 		if !ok {
 			j := json.NewEncoder(c1)
 			m.Message = "Disconected"
+			m.To = m.From
+			m.From = "Server"
 			j.Encode(&m)
 			continue
 		}
