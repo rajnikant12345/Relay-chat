@@ -24,6 +24,6 @@ you can connect multiple users by running multiple telnet client.
 ### Communicate
 For communicating just send:
 ```
-{"From":"rajni","To":"Sharad","Message":"Hi Rajni, how are you"
+{"From":"rajni","To":"Sharad","Message":"Hi Rajni, how are you"}
 ```
 **You can develope clients arounnd it and play.**
