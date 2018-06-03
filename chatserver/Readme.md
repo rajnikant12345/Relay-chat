@@ -4,8 +4,10 @@ just start server by setting environment variable: MY_SERVER_PORT
 and you can use telnet as your chat client.
 e.g.
 ## Server Side
+```
 export MY_SERVER_PORT 6789
 go run main.go
+```
 
 ## Client side
 telnet localhost 6789
