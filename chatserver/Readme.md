@@ -14,7 +14,14 @@ Rajnis-Air:~ rajnikant$ telnet localhost 6789
 Trying ::1...
 Connected to localhost.
 Escape character is '^]'.
-You are connected , please enter your user name: *rajni*
+You are connected , please enter your user name: **rajni**
 rajni: You are conected
 ```
+you can connect multiple users by running multiple telnet client.
 
+### Communicate
+For communicating just send:
+```
+{"From":"rajni","To":"Sharad","Message":"Hi Rajni, how are you"
+```
+** You can develope clients arounnd it and play. **
