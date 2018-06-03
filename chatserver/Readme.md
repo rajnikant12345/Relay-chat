@@ -9,11 +9,12 @@ go run main.go
 
 ## Client side
 telnet localhost 6789
-'''
+```
 Rajnis-Air:~ rajnikant$ telnet localhost 6789
 Trying ::1...
 Connected to localhost.
 Escape character is '^]'.
 You are connected , please enter your user name: *rajni*
 rajni: You are conected
-'''
+```
+
