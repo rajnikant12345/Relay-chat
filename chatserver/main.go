@@ -84,6 +84,7 @@ func processMessage(c chan MessageStruct) {
 			j.Encode(&m)
 			continue
 		}
+		fmt.Println(m.From , "=>",m.To ," : ", m.Message)
 		j := json.NewEncoder(c2)
 		j.Encode(&m)
 
