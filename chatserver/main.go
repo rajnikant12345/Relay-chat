@@ -13,9 +13,13 @@ import (
 	"sync"
 )
 
+//This map saves existing user and connection mapping
 var userConn map[string]net.Conn
+
+//This is a read write lock, for userConn map
 var mu sync.RWMutex
 
+// Write to map
 func WriteMap(s string, c net.Conn) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -23,6 +27,7 @@ func WriteMap(s string, c net.Conn) {
 
 }
 
+//Delete entry from map
 func DelMap(s string) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -30,6 +35,7 @@ func DelMap(s string) {
 
 }
 
+// Clean all the connections from map
 func CleanSlate() {
 	mu.Lock()
 	defer mu.Unlock()
@@ -40,6 +46,7 @@ func CleanSlate() {
 	}
 }
 
+// Read value from map
 func GetFromMap(s string) (net.Conn, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
@@ -47,12 +54,14 @@ func GetFromMap(s string) (net.Conn, bool) {
 	return c, ok
 }
 
+//Write value to connection
 func writeIt(c net.Conn, s string) {
 	w := bufio.NewWriter(c)
 	w.WriteString(s)
 	w.Flush()
 }
 
+//Read value from connection
 func readit(c net.Conn) (string, error) {
 	r := bufio.NewReader(c)
 	s, err := r.ReadString('\n')
@@ -62,18 +71,24 @@ func readit(c net.Conn) (string, error) {
 	return strings.TrimSpace(s), nil
 }
 
+//This struct translates to JSON and server expects same fromat from clients. refer README.md
 type MessageStruct struct {
 	From    string
 	To      string
 	Message string
 }
 
+
+// This is worker go routine
 func processMessage(c chan MessageStruct) {
+	// While bufferd channel c is nor closed, iterate channel and m has iterated value m is of type MessageStruct
 	for m := range c {
+		//Read sender's name from m
 		c1, ok := GetFromMap(m.From)
 		if !ok {
 			continue
 		}
+		//Read receiver's name from m
 		c2, ok := GetFromMap(m.To)
 		if !ok {
 			fmt.Println("socker", c1)
@@ -87,6 +102,7 @@ func processMessage(c chan MessageStruct) {
 			}
 			continue
 		}
+		//send message to receiver
 		fmt.Println(m.From, "=>", m.To, " : ", m.Message)
 		j := json.NewEncoder(c2)
 		j.Encode(&m)
