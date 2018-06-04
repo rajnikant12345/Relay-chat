@@ -110,7 +110,9 @@ func processMessage(c chan MessageStruct) {
 	}
 }
 
+//This is main function
 func main() {
+	//create a buffered channel
 	ch := make(chan MessageStruct, 100)
 	mu = sync.RWMutex{}
 	userConn = make(map[string]net.Conn)
@@ -125,6 +127,7 @@ func main() {
 		return
 	}
 
+	//start listening
 	l, err := net.Listen("tcp", "0.0.0.0:"+port)
 
 	if err != nil {
@@ -132,6 +135,7 @@ func main() {
 		return
 	}
 
+	// this go routine handles ctrl + c
 	go func() {
 		signalChan := make(chan os.Signal, 1)
 		cleanupDone := make(chan bool)
@@ -147,17 +151,21 @@ func main() {
 		os.Exit(0)
 	}()
 
+	// I am launching 10 go routines which act as worker, TODO: this value can be configurable.
 	for i := 0; i < 10; i++ {
 		go processMessage(ch)
 	}
 
 	for {
+		//accept connection
 		c, err := l.Accept()
 		if err != nil {
 			fmt.Println(err.Error(), " Stopping the server..")
 			c.Close()
 			return
 		}
+		
+		// Launch a go routine per connection.
 		go func(net.Conn) {
 			writeIt(c, "You are connected , please enter your user name: ")
 			s, _ := readit(c)
@@ -174,6 +182,7 @@ func main() {
 			writeIt(c, s+": You are conected\n")
 			WriteMap(s, c)
 			for {
+				// read message
 				m := MessageStruct{}
 				j := json.NewDecoder(c)
 				err := j.Decode(&m)
@@ -186,6 +195,7 @@ func main() {
 					writeIt(c, "Fail to decode message\n")
 					continue
 				}
+				//write message to bufferd channel
 				ch <- m
 			}
 		}(c)
