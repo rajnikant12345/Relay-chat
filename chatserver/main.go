@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
-	//"strings"
 	"encoding/json"
 	"io"
 	"strings"
@@ -77,14 +76,18 @@ func processMessage(c chan MessageStruct) {
 		}
 		c2, ok := GetFromMap(m.To)
 		if !ok {
+			fmt.Println("socker", c1)
 			j := json.NewEncoder(c1)
 			m.Message = "Disconected"
 			m.To = m.From
 			m.From = "Server"
-			j.Encode(&m)
+			err := j.Encode(&m)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 			continue
 		}
-		fmt.Println(m.From , "=>",m.To ," : ", m.Message)
+		fmt.Println(m.From, "=>", m.To, " : ", m.Message)
 		j := json.NewEncoder(c2)
 		j.Encode(&m)
 
@@ -142,6 +145,15 @@ func main() {
 		go func(net.Conn) {
 			writeIt(c, "You are connected , please enter your user name: ")
 			s, _ := readit(c)
+
+			_, ok := GetFromMap(s)
+
+			if ok {
+				writeIt(c, "User already connected.")
+				c.Close()
+				return
+			}
+
 			fmt.Println(s, " is connected")
 			writeIt(c, s+": You are conected\n")
 			WriteMap(s, c)
