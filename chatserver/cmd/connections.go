@@ -37,6 +37,8 @@ func StartWorkers() {
 	}
 }
 
+
+
 //TODO: Handle timeout of an idle connection
 //TODO: remove terminated connection from usermap
 
@@ -48,10 +50,11 @@ func HandleConnections(c net.Conn, conn string) {
 		e := j.Decode(&m)
 		if e != nil {
 			if e == io.EOF {
+				model.DeleteFromConnMap(conn)
 				log.Println("Conection terminated.")
 				return
 			} else {
-				log.Println(e.Error())
+				log.Println("Handle Connection",e.Error())
 				continue
 			}
 		}

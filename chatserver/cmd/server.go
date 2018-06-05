@@ -84,7 +84,8 @@ func StartServer() {
 		enc := json.NewEncoder(c)
 		e = enc.Encode(&m)
 		if e != nil {
-			log.Println(e.Error())
+
+			log.Println("Accept Loop",e.Error())
 			continue
 		}
 		go HandleConnections(c, m.Conn)

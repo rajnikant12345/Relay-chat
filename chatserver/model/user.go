@@ -49,22 +49,27 @@ func WriteMap(key string, value Connection) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	userMap[key] = value
-	//connMap[value.Connid] = key
+	connMap[value.Connid] = key
 }
 
-/*
-func DeleteFromConnMap(key string) {
+
+func DeleteFromConnMap(cid string) {
 	mutex.Lock()
 	defer mutex.Unlock()
-	v, ok := connMap[key]
+	v, ok := connMap[cid]
 	if !ok {
 		return
 	}
-	userMap[key].C.Close()
+	delete(connMap, cid)
+	_, ok = userMap[v]
+	if !ok {
+		return
+	}
+	userMap[v].C.Close()
 	delete(userMap, v)
-	delete(connMap, key)
+
 }
-*/
+
 
 func ReadKey(key string) (Connection, bool) {
 	mutex.RLock()
@@ -81,6 +86,7 @@ func DeleteFromMap(key string) {
 		return
 	}
 	userMap[key].C.Close()
+	delete(connMap,userMap[key].Connid)
 	delete(userMap, key)
 }
 
@@ -90,6 +96,7 @@ func ClearMap() {
 	for k, v := range userMap {
 		v.C.Close()
 		delete(userMap, k)
+		delete(connMap, v.Connid)
 	}
 
 }

@@ -42,11 +42,13 @@ func ProcessKeyExchange(m model.CommonMessage, c net.Conn) {
 	if !ok {
 		log.Println("User not logged in:", m.KeyExchg.From)
 		WriteMessage(c, m, fail, "chat-server", m.KeyExchg.From)
+		return
 	}
 	val, ok := model.ReadKey(m.KeyExchg.To)
 	if !ok {
 		log.Println("Second User not logged in:", m.KeyExchg.To)
 		WriteMessage(c, m, fail, "chat-server", m.KeyExchg.From)
+		return
 	}
 	encoder := json.NewEncoder(val.C)
 	e := encoder.Encode(&m)
@@ -81,11 +83,13 @@ func ProcessMessage(m model.CommonMessage, c net.Conn) {
 		if !ok {
 			log.Println("User not logged in:", m.Msg.From)
 			WriteMessage(c, m, fail, "chat-server", m.Msg.From)
+			return
 		}
 		v, ok := model.ReadKey(m.Msg.To)
 		if !ok {
 			log.Println("Second User not logged in:", m.Msg.To)
 			WriteMessage(c, m, fail, "chat-server", m.Msg.From)
+			return
 		}
 		encoder := json.NewEncoder(v.C)
 		e := encoder.Encode(&m)
