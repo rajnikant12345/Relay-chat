@@ -1,44 +1,39 @@
 package model
 
 type CommonMessage struct {
-	Req Request
-	Res Response
+	Conn string `json:"conn,omitempty"`
+	Ref string `json:"ref,omitempty"`
+	KeyExchg *KeyExchange	`json:"key_exchg,omitempty"`
+	Msg     *Message		`json:"message,omitempty"`
+	Lgin    *Login		`json:"login,omitempty"`
+	Reg     *Register	`json:"reg,omitempty"`
 }
 
-type Request struct {
-	RequestType string `json:"request_type"`
-	Reg     Register	`json:"reg"`
-	Lgin    Login		`json:"login"`
-	Msg     Message		`json:"message"`
-	KeyExchg KeyExchange	`json:"key_exchg"`
-}
 
 type Register struct {
-	UserName string		`json:"user_name"`
-	PasswordHash string	`json:"password_hash"`
-	ConfirmHash string	`json:"confirm_hash"`
+	UserName string		`json:"user_name,omitempty"`
+	PasswordHash string	`json:"password_hash,omitempty"`
+	ConfirmHash string	`json:"confirm_hash,omitempty"`
 }
 
 type Login struct {
-	UserName string		`json:"user_name"`
-	PasswordHash string	`json:"password_hash"`
+	UserName string		`json:"user_name,omitempty"`
+	PasswordHash string	`json:"password_hash,omitempty"`
 }
 
 type Message struct {
-	Jwt string		`json:"jwt"`
-	To string		`json:"to"`
-	From string		`json:"from"`
-	DataType string		`json:"data_type"`
-	Data string		`json:"data"`
+	Jwt string		`json:"jwt,omitempty"`
+	To string		`json:"to,omitempty"`
+	From string		`json:"from,omitempty"`
+	DataType string		`json:"data_type,omitempty"`
+	Data string		`json:"data,omitempty"`
 }
 
 type KeyExchange struct {
-	Jwt string	`json:"jwt"`
-	Key string	`json:"key"`
+	Jwt string	`json:"jwt,omitempty"`
+	Key string	`json:"key,omitempty"`
 }
 
-type Response struct {
-	ResponseType string	`json:"response_type"`
-	IncomingMessage Message	`json:"incoming_message"`
-	KeyExchange	KeyExchange `json:"key_exchange"`
+func GetUserFromConnId(id string) {
+	
 }

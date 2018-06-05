@@ -1,29 +1,33 @@
-package cmd
+package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+	"errors"
+	"log"
 )
 
 type Config struct {
 	Port string
 	Key  string
 	Cert string
+	ChannelSize int
+	Workers int
 }
 
-func GetConfig(file string) Config {
+var CFG Config
+
+func GetConfig(file string) (Config, error) {
 	f, e := os.Open(file)
 	if e != nil {
-		fmt.Print("Unable to open config file", file, e.Error())
-		return Config{}
+		log.Println("Unable to open config file", file, e.Error())
+		return CFG , errors.New("Unable to open file.")
 	}
 	d := json.NewDecoder(f)
-	c := Config{}
-	e = d.Decode(&c)
+	e = d.Decode(&CFG)
 	if e != nil {
-		fmt.Print("Unable to decode config file", file, e.Error())
-		return Config{}
+		log.Println("Unable to decode config file", file, e.Error())
+		return CFG , errors.New("Unable to open file.")
 	}
-	return c
+	return CFG ,nil
 }
