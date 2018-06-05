@@ -9,6 +9,8 @@ import (
 	"cryptolessons/chatserver/processors"
 	"cryptolessons/chatserver/model"
 	"encoding/json"
+	"os/signal"
+	"fmt"
 )
 
 func BeginTLS(key, cert, port string) (net.Listener, error) {
@@ -53,6 +55,21 @@ func StartServer() {
 
 	StartWorkers()
 
+	go func() {
+		signalChan := make(chan os.Signal, 1)
+		cleanupDone := make(chan bool)
+		signal.Notify(signalChan, os.Interrupt)
+		go func() {
+			for _ = range signalChan {
+				fmt.Println("\nReceived an interrupt, stopping services...\n")
+				model.ClearMap()
+				cleanupDone <- true
+			}
+		}()
+		<-cleanupDone
+		os.Exit(0)
+	}()
+
 	for {
 		c, e := l.Accept()
 		if e != nil {
@@ -70,7 +87,7 @@ func StartServer() {
 			log.Println(e.Error())
 			continue
 		}
-		go HandleConnections(c , m.Conn , m.Ref )
+		go HandleConnections(c , m.Conn )
 	}
 }
 

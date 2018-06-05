@@ -14,7 +14,7 @@ var ch chan channelData
 
 type channelData struct {
 	m model.CommonMessage
-	encoder *json.Encoder
+	encoder net.Conn
 }
 
 func processMessage(ch chan channelData) {
@@ -39,14 +39,13 @@ func StartWorkers() {
 }
 
 //TODO: Handle timeout of an idle connection
+//TODO: remove termonated connection from usermap
 
-
-func HandleConnections(c net.Conn, conn, ref string) {
+func HandleConnections(c net.Conn, conn string) {
 
 	for {
 		m := model.CommonMessage{}
 		j := json.NewDecoder(c)
-		encoder := json.NewEncoder(c)
 		e := j.Decode(&m)
 		if e != nil {
 			if e == io.EOF {
@@ -57,14 +56,13 @@ func HandleConnections(c net.Conn, conn, ref string) {
 				continue
 			}
 		}
-
-		//validate conection id and ref id
+		//validate conection id
 		if m.Conn != conn {
 			c.Close()
 			break
 		}
 
-		cdata := channelData{m,encoder}
+		cdata := channelData{m,c}
 
 		ch <- cdata
 	}

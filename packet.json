@@ -1,0 +1,18 @@
+[{
+  "conn":"191eee7e-a0c2-4179-9656-da622e59bf82",
+  "login": { "user_name":"sharad" }
+}
+
+,
+{
+  "conn":"2361cacd-a6d8-4a36-ad9c-7a4b43341ecf",
+  "message": { "to":"sharad","from":"rajni","data":"hi sharad" }
+}
+,
+
+{
+  "conn":"191eee7e-a0c2-4179-9656-da622e59bf82",
+  "message": { "to":"rajni","from":"sharad","data":"hi rajni" }
+}
+
+]
