@@ -33,6 +33,7 @@ type KeyExchange struct {
 var mutex sync.RWMutex
 
 var userMap map[string]Connection
+var connMap map[string]string
 
 type Connection struct {
 	Connid string
@@ -41,13 +42,29 @@ type Connection struct {
 
 func init() {
 	userMap = make(map[string]Connection)
+	connMap = make(map[string]string)
 }
 
 func WriteMap(key string, value Connection) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	userMap[key] = value
+	//connMap[value.Connid] = key
 }
+
+/*
+func DeleteFromConnMap(key string) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	v, ok := connMap[key]
+	if !ok {
+		return
+	}
+	userMap[key].C.Close()
+	delete(userMap, v)
+	delete(connMap, key)
+}
+*/
 
 func ReadKey(key string) (Connection, bool) {
 	mutex.RLock()

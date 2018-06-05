@@ -1,28 +1,27 @@
 package cmd
 
 import (
-	"net"
 	"cryptolessons/chatserver/config"
 	"cryptolessons/chatserver/model"
+	"cryptolessons/chatserver/processors"
 	"encoding/json"
 	"io"
 	"log"
-	"cryptolessons/chatserver/processors"
+	"net"
 )
 
 var ch chan channelData
 
 type channelData struct {
-	m model.CommonMessage
+	m       model.CommonMessage
 	encoder net.Conn
 }
 
 func processMessage(ch chan channelData) {
 	for m := range ch {
-		processors.ProcessMessage(m.m , m.encoder)
+		processors.ProcessMessage(m.m, m.encoder)
 	}
 }
-
 
 func StartWorkers() {
 	chansz := config.CFG.ChannelSize
@@ -31,15 +30,15 @@ func StartWorkers() {
 		chansz = 1000
 	}
 
-	ch = make(chan channelData , chansz)
+	ch = make(chan channelData, chansz)
 
-	for i:=0;i<config.CFG.Workers;i++ {
+	for i := 0; i < config.CFG.Workers; i++ {
 		go processMessage(ch)
 	}
 }
 
 //TODO: Handle timeout of an idle connection
-//TODO: remove termonated connection from usermap
+//TODO: remove terminated connection from usermap
 
 func HandleConnections(c net.Conn, conn string) {
 
@@ -51,7 +50,7 @@ func HandleConnections(c net.Conn, conn string) {
 			if e == io.EOF {
 				log.Println("Conection terminated.")
 				return
-			}else {
+			} else {
 				log.Println(e.Error())
 				continue
 			}
@@ -62,7 +61,7 @@ func HandleConnections(c net.Conn, conn string) {
 			break
 		}
 
-		cdata := channelData{m,c}
+		cdata := channelData{m, c}
 
 		ch <- cdata
 	}

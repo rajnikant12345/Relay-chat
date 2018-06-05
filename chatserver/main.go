@@ -9,5 +9,3 @@ func main() {
 	log.Println("Starting server")
 	cmd.StartServer()
 }
-
-

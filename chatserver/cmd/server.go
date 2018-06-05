@@ -3,14 +3,14 @@ package cmd
 import (
 	"crypto/tls"
 	"cryptolessons/chatserver/config"
+	"cryptolessons/chatserver/model"
+	"cryptolessons/chatserver/processors"
+	"encoding/json"
+	"fmt"
+	"log"
 	"net"
 	"os"
-	"log"
-	"cryptolessons/chatserver/processors"
-	"cryptolessons/chatserver/model"
-	"encoding/json"
 	"os/signal"
-	"fmt"
 )
 
 func BeginTLS(key, cert, port string) (net.Listener, error) {
@@ -87,7 +87,6 @@ func StartServer() {
 			log.Println(e.Error())
 			continue
 		}
-		go HandleConnections(c , m.Conn )
+		go HandleConnections(c, m.Conn)
 	}
 }
-
