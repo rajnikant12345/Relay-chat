@@ -53,8 +53,6 @@ func StartServer() {
 		log.Println(e.Error())
 	}
 
-	StartWorkers()
-
 	go func() {
 		signalChan := make(chan os.Signal, 1)
 		cleanupDone := make(chan bool)
