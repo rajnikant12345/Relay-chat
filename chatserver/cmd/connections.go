@@ -17,6 +17,14 @@ type channelData struct {
 	encoder net.Conn
 }
 
+// THIS CODE IS PROBLEM, WILL CHANGE THIS
+// TODAY
+//THIS IS CORRUPTING MY DATA OVER NET.comm
+// AS MULTIPLE GO ROUTINES ARE FUCKING 
+//IT UP
+
+// 
+
 func processMessage(ch chan channelData) {
 	for m := range ch {
 		processors.ProcessMessage(m.m, m.encoder)
