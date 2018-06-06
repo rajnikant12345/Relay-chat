@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"cryptolessons/chatserver/model"
-	"os"
 	"testing"
 	"net"
 	"encoding/json"
@@ -10,7 +9,6 @@ import (
 	"cryptolessons/chatserver/processors"
 
 	"sync"
-	"time"
 )
 
 
@@ -18,8 +16,11 @@ func Decoder(c net.Conn) {
 	dec := json.NewDecoder(c)
 	for {
 		m := model.CommonMessage{}
-		dec.Decode(&m)
-		fmt.Println(m.Msg.From , m.Msg.To , m.Msg.Data)
+		e := dec.Decode(&m)
+		if e == nil {
+			fmt.Println(m.Msg.From , m.Msg.To , m.Msg.Data)
+		}
+
 	}
 }
 
@@ -28,7 +29,7 @@ func Decoder(c net.Conn) {
 
 func TestHandleConnections(t *testing.T) {
 
-	users := make([]string,200)
+	users := make([]string,50)
 	cid := make([]string,10000)
 	conn := make([]net.Conn,10000)
 	var wg sync.WaitGroup
@@ -85,7 +86,10 @@ func TestHandleConnections(t *testing.T) {
 	wg.Wait()
 
 	for i,_ := range users {
-		conn[i].Close()
+		if conn[i] != nil {
+			conn[i].Close()
+		}
+
 	}
 
 
