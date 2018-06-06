@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"cryptolessons/chatserver/config"
 	"cryptolessons/chatserver/model"
 	"cryptolessons/chatserver/processors"
 	"encoding/json"
@@ -10,20 +9,10 @@ import (
 	"net"
 )
 
-var ch chan channelData
-
 type channelData struct {
 	m       model.CommonMessage
 	encoder net.Conn
 }
-
-// THIS CODE IS PROBLEM, WILL CHANGE THIS
-// TODAY
-//THIS IS CORRUPTING MY DATA OVER NET.comm
-// AS MULTIPLE GO ROUTINES ARE FUCKING 
-//IT UP
-
-// 
 
 func processMessage(ch chan channelData) {
 	for m := range ch {
@@ -31,30 +20,25 @@ func processMessage(ch chan channelData) {
 	}
 }
 
-func StartWorkers() {
-	chansz := config.CFG.ChannelSize
-
-	if chansz == 0 {
-		chansz = 1000
-	}
-
-	ch = make(chan channelData, chansz)
-
-	for i := 0; i < config.CFG.Workers; i++ {
+func StartWorkers(ch chan channelData) {
+	for i := 0; i < 10; i++ {
 		go processMessage(ch)
 	}
 }
 
-
-
 //TODO: Handle timeout of an idle connection
-//TODO: remove terminated connection from usermap
 
 func HandleConnections(c net.Conn, conn string) {
 
+	var ch chan channelData
+	ch = make(chan channelData, 1000)
+
+	StartWorkers(ch)
+
+	j := json.NewDecoder(c)
+
 	for {
 		m := model.CommonMessage{}
-		j := json.NewDecoder(c)
 		e := j.Decode(&m)
 		if e != nil {
 			if e == io.EOF {
@@ -62,8 +46,9 @@ func HandleConnections(c net.Conn, conn string) {
 				log.Println("Conection terminated.")
 				return
 			} else {
-				log.Println("Handle Connection",e.Error())
-				continue
+				model.DeleteFromConnMap(conn)
+				log.Println("Handle Connection, closing ", e.Error())
+				return
 			}
 		}
 		//validate conection id
