@@ -11,6 +11,7 @@ type Config struct {
 	Port        string
 	Key         string
 	Cert        string
+	Loglevel    string
 	ChannelSize int
 	Workers     int
 }
@@ -30,4 +31,9 @@ func GetConfig(file string) (Config, error) {
 		return CFG, errors.New("Unable to open file.")
 	}
 	return CFG, nil
+}
+
+
+func init() {
+	GetConfig(os.Getenv("APP_CFG"))
 }

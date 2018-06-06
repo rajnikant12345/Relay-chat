@@ -9,6 +9,7 @@ import (
 	"cryptolessons/chatserver/processors"
 
 	"sync"
+	"time"
 )
 
 
@@ -29,7 +30,7 @@ func Decoder(c net.Conn) {
 
 func TestHandleConnections(t *testing.T) {
 
-	users := make([]string,50)
+	users := make([]string,2)
 	cid := make([]string,10000)
 	conn := make([]net.Conn,10000)
 	var wg sync.WaitGroup
@@ -54,9 +55,11 @@ func TestHandleConnections(t *testing.T) {
 
 			cid[i] = m.Conn
 
+			 fmt.Println(m.Conn)
 			m.Lgin = &model.Login{}
 			m.Lgin.UserName = users[i]
 			enc.Encode(&m)
+
 			go Decoder(c)
 		}(i)
 	}
@@ -74,7 +77,7 @@ func TestHandleConnections(t *testing.T) {
 				m := model.CommonMessage{}
 				m.Conn = cid[i]
 				m.Msg = &model.Message{}
-				m.Msg.Data = "hello " + users[j] + " from " + users[i]
+				m.Msg.Data = "hello "
 				m.Msg.From = users[i]
 				m.Msg.To = users[j]
 				enc.Encode(&m)
@@ -84,6 +87,8 @@ func TestHandleConnections(t *testing.T) {
 
 	}
 	wg.Wait()
+
+	time.Sleep(time.Second*5)
 
 	for i,_ := range users {
 		if conn[i] != nil {

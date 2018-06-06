@@ -5,8 +5,9 @@ import (
 	"cryptolessons/chatserver/processors"
 	"encoding/json"
 	"io"
-	"log"
 	"net"
+	"cryptolessons/chatserver/applog"
+	"cryptolessons/chatserver/config"
 )
 
 type channelData struct {
@@ -21,7 +22,7 @@ func processMessage(ch chan channelData) {
 }
 
 func StartWorkers(ch chan channelData) {
-	for i := 0; i < 10; i++ {
+	for i := 0; i < config.CFG.Workers; i++ {
 		go processMessage(ch)
 	}
 }
@@ -30,8 +31,9 @@ func StartWorkers(ch chan channelData) {
 
 func HandleConnections(c net.Conn, conn string) {
 
+	applog.Info.Println("Starting Handle Connection for", conn)
 	var ch chan channelData
-	ch = make(chan channelData, 1000)
+	ch = make(chan channelData, config.CFG.ChannelSize)
 
 	StartWorkers(ch)
 
@@ -42,17 +44,18 @@ func HandleConnections(c net.Conn, conn string) {
 		e := j.Decode(&m)
 		if e != nil {
 			if e == io.EOF {
+				applog.Warning.Println("Terminating connection for", conn, "ERROR:", e.Error())
 				model.DeleteFromConnMap(conn)
-				log.Println("Conection terminated.")
 				return
 			} else {
+				applog.Warning.Println("Terminating connection for", conn,"ERROR:", e.Error())
 				model.DeleteFromConnMap(conn)
-				log.Println("Handle Connection, closing ", e.Error())
 				return
 			}
 		}
 		//validate conection id
 		if m.Conn != conn {
+			applog.Error.Println("Expected conid:",conn, "Receive Connid:",m.Conn)
 			c.Close()
 			break
 		}

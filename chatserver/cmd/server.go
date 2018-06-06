@@ -6,11 +6,11 @@ import (
 	"cryptolessons/chatserver/model"
 	"cryptolessons/chatserver/processors"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net"
 	"os"
 	"os/signal"
+	"cryptolessons/chatserver/applog"
 )
 
 func BeginTLS(key, cert, port string) (net.Listener, error) {
@@ -43,11 +43,8 @@ func BeginTCP(port string) (net.Listener, error) {
 }
 
 func StartServer() {
-	cfg, e := config.GetConfig(os.Getenv("APP_CFG"))
-	if e != nil {
-		log.Println(e.Error())
-		return
-	}
+	cfg := config.CFG
+
 	l, e := BeginTLS(cfg.Key, cfg.Cert, cfg.Port)
 	if e != nil {
 		log.Println(e.Error())
@@ -59,7 +56,7 @@ func StartServer() {
 		signal.Notify(signalChan, os.Interrupt)
 		go func() {
 			for _ = range signalChan {
-				fmt.Println("\nReceived an interrupt, stopping services...\n")
+				applog.Warning.Println("Received an interrupt, stopping services...")
 				model.ClearMap()
 				cleanupDone <- true
 			}
@@ -83,7 +80,7 @@ func StartServer() {
 		e = enc.Encode(&m)
 		if e != nil {
 
-			log.Println("Accept Loop",e.Error())
+			applog.Error.Println("Accept Loop",e.Error())
 			continue
 		}
 		go HandleConnections(c, m.Conn)

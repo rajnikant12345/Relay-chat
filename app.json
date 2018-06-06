@@ -1,5 +1,6 @@
 {
   "Port":"6789",
-  "Workers":100,
-  "ChannelSize":1000
+  "Workers":10,
+  "ChannelSize":1000,
+  "Loglevel":"DEBUG"
 }
