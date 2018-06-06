@@ -1,114 +1,131 @@
 package main
 
+
 import (
-	"bufio"
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net"
 	"os"
+	"bufio"
+	"strings"
 )
 
-type MessageStruct struct {
-	From    string
-	To      string
-	Message string
+type CommonMessage struct {
+	Conn     string       `json:"conn,omitempty"`
+	Ref      string       `json:"ref,omitempty"`
+	KeyExchg *KeyExchange `json:"key_exchg,omitempty"`
+	Msg      *Message     `json:"message,omitempty"`
+	Lgin     *Login       `json:"login,omitempty"`
 }
 
-func MessageEncryptor(k, s string) string {
-	h := sha256.New()
-	b := h.Sum([]byte(k))
-	fmt.Println()
-	c, e := aes.NewCipher(b[:32])
-	if e != nil {
-		fmt.Println(e.Error())
-		return s
-	}
-
-	m := cipher.NewCFBEncrypter(c, b[:c.BlockSize()])
-	out := make([]byte, len(s))
-	m.XORKeyStream(out, []byte(s))
-
-	return hex.EncodeToString(out)
+type Login struct {
+	UserName     string `json:"user_name,omitempty"`
+	PasswordHash string `json:"password_hash,omitempty"`
 }
 
-func MessageDecryptor(k, s string) string {
-	d, _ := hex.DecodeString(s)
-	h := sha256.New()
-	b := h.Sum([]byte(k))
-	fmt.Println()
-	c, e := aes.NewCipher(b[:32])
-	if e != nil {
-		fmt.Println(e.Error())
-		return s
-	}
-	m := cipher.NewCFBDecrypter(c, b[:c.BlockSize()])
-	out := make([]byte, len(d))
-	m.XORKeyStream(out, d)
-	return string(out)
-
+type Message struct {
+	To   string `json:"to,omitempty"`
+	From string `json:"from,omitempty"`
+	Data string `json:"data,omitempty"`
 }
+
+type KeyExchange struct {
+	From string `json:"from,omitempty"`
+	To   string `json:"to,omitempty"`
+	Key  string `json:"key,omitempty"`
+}
+
+
 
 func main() {
-	var ip, port, user, friend, key string
-	fmt.Print("Enter IP of Server:")
-	fmt.Scanf("%s\n", &ip)
-	fmt.Print("Enter port of Server:")
-	fmt.Scanf("%s\n", &port)
-	fmt.Print("Enter encryption key for messages.:")
-	fmt.Scanf("%s\n", &key)
+
+
+	if len(os.Args) < 5 {
+		fmt.Println("Please enter ip port user friend key(optional) ")
+		return
+	}
+
+	ip := os.Args[1]
+	port := os.Args[2]
+	user := os.Args[3]
+	file := os.Args[4]
 
 	c, e := net.Dial("tcp", ip+":"+port)
 	if e != nil {
 		fmt.Println(e.Error())
 		return
 	}
-	w := bufio.NewWriter(c)
-	r := bufio.NewReader(c)
-	s, _ := r.ReadString(':')
-	fmt.Println(s)
+	m := &CommonMessage{}
 
-	fmt.Print("\nEnter user of Server:")
-	fmt.Scanf("%s\n", &user)
+	decoder := json.NewDecoder(c)
+	encoder := json.NewEncoder(c)
 
-	w.WriteString(user + "\n")
-	w.Flush()
-	fmt.Print("\nEnter friend name:")
-	fmt.Scanf("%s\n", &friend)
+	err := decoder.Decode(&m)
 
-	s, _ = r.ReadString('\n')
-	fmt.Println(s)
-
-	go func() {
-		for {
-			m := MessageStruct{}
-			j := json.NewDecoder(c)
-			err := j.Decode(&m)
-			if err != nil {
-				fmt.Println("Message error", err.Error())
-				continue
-			}
-			if key != "" {
-				m.Message = MessageDecryptor(key, m.Message)
-			}
-			fmt.Println("Message From", m.From, ":", m.Message)
+	if err != nil {
+		if err != nil {
+			fmt.Println("Decode Main",err.Error())
+			os.Exit(-1)
 		}
-	}()
-
-	for {
-		m := MessageStruct{}
-		in := bufio.NewReader(os.Stdin)
-		m.Message, _ = in.ReadString('\n')
-		m.From = user
-		m.To = friend
-		if key != "" {
-			m.Message = MessageEncryptor(key, m.Message)
-		}
-		j := json.NewEncoder(c)
-		j.Encode(&m)
 	}
+	cid := m.Conn
+
+	m.Lgin = &Login{}
+	m.Conn = cid
+	m.Lgin.UserName = user
+	err = encoder.Encode(&m)
+
+	if err != nil {
+		fmt.Println("Decode Main",err.Error())
+		os.Exit(-1)
+	}
+
+	m1 := &CommonMessage{}
+	err = decoder.Decode(&m1)
+
+	if err != nil {
+		fmt.Println("message",err.Error())
+		os.Exit(-1)
+	}
+	fmt.Println(m1.Msg.From , m1.Msg.Data)
+
+	inFile, err := os.Open(file)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(-1)
+	}
+	defer inFile.Close()
+	scanner := bufio.NewScanner(inFile)
+	scanner.Split(bufio.ScanLines)
+
+	for scanner.Scan() {
+		m := CommonMessage{}
+		command := strings.Split(scanner.Text()," ")
+		switch command[0] {
+		case "message":
+			m.Conn = cid
+			m.Msg = &Message{}
+			m.Msg.Data = command[2]
+			m.Msg.To = command[1]
+			m.Msg.From = user
+			err = encoder.Encode(&m)
+			if err != nil {
+				fmt.Println("message",err.Error())
+				os.Exit(-1)
+			}
+		//	time.Sleep(time.Millisecond*2)
+
+		/*	m1 := &CommonMessage{}
+			err := decoder.Decode(&m1)
+
+			if err != nil {
+				fmt.Println("message",err.Error())
+				os.Exit(-1)
+			}
+			fmt.Println(m1.Msg.From , m1.Msg.Data)*/
+		}
+	}
+
+	c.Close()
 
 }
