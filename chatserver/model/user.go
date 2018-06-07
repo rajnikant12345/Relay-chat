@@ -16,7 +16,7 @@ type CommonMessage struct {
 
 type Login struct {
 	UserName     string `json:"user_name,omitempty"`
-	PasswordHash string `json:"password_hash,omitempty"`
+	Bearer string `json:"bearer,omitempty"`
 }
 
 type Message struct {

@@ -1,12 +1,11 @@
 package main
 
-
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
 	"os"
-	"bufio"
 	"strings"
 )
 
@@ -35,10 +34,7 @@ type KeyExchange struct {
 	Key  string `json:"key,omitempty"`
 }
 
-
-
 func main() {
-
 
 	if len(os.Args) < 5 {
 		fmt.Println("Please enter ip port user friend key(optional) ")
@@ -64,7 +60,7 @@ func main() {
 
 	if err != nil {
 		if err != nil {
-			fmt.Println("Decode Main",err.Error())
+			fmt.Println("Decode Main", err.Error())
 			os.Exit(-1)
 		}
 	}
@@ -76,7 +72,7 @@ func main() {
 	err = encoder.Encode(&m)
 
 	if err != nil {
-		fmt.Println("Decode Main",err.Error())
+		fmt.Println("Decode Main", err.Error())
 		os.Exit(-1)
 	}
 
@@ -84,10 +80,10 @@ func main() {
 	err = decoder.Decode(&m1)
 
 	if err != nil {
-		fmt.Println("message",err.Error())
+		fmt.Println("message", err.Error())
 		os.Exit(-1)
 	}
-	fmt.Println(m1.Msg.From , m1.Msg.Data)
+	fmt.Println(m1.Msg.From, m1.Msg.Data)
 
 	inFile, err := os.Open(file)
 	if err != nil {
@@ -100,7 +96,7 @@ func main() {
 
 	for scanner.Scan() {
 		m := CommonMessage{}
-		command := strings.Split(scanner.Text()," ")
+		command := strings.Split(scanner.Text(), " ")
 		switch command[0] {
 		case "message":
 			m.Conn = cid
@@ -110,19 +106,19 @@ func main() {
 			m.Msg.From = user
 			err = encoder.Encode(&m)
 			if err != nil {
-				fmt.Println("message",err.Error())
+				fmt.Println("message", err.Error())
 				os.Exit(-1)
 			}
-		//	time.Sleep(time.Millisecond*2)
+			//	time.Sleep(time.Millisecond*2)
 
-		/*	m1 := &CommonMessage{}
-			err := decoder.Decode(&m1)
+			/*	m1 := &CommonMessage{}
+				err := decoder.Decode(&m1)
 
-			if err != nil {
-				fmt.Println("message",err.Error())
-				os.Exit(-1)
-			}
-			fmt.Println(m1.Msg.From , m1.Msg.Data)*/
+				if err != nil {
+					fmt.Println("message",err.Error())
+					os.Exit(-1)
+				}
+				fmt.Println(m1.Msg.From , m1.Msg.Data)*/
 		}
 	}
 
