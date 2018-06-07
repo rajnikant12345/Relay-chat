@@ -6,5 +6,5 @@ import (
 )
 
 type Processor interface {
-	 ProcessMessage(m model.CommonMessage, c net.Conn)
+	ProcessMessage(m model.CommonMessage, c net.Conn)
 }

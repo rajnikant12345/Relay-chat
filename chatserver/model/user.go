@@ -1,9 +1,9 @@
 package model
 
 import (
+	"Relay-chat/chatserver/applog"
 	"net"
 	"sync"
-	"Relay-chat/chatserver/applog"
 )
 
 type CommonMessage struct {
@@ -38,7 +38,7 @@ var connMap map[string]string
 
 type Connection struct {
 	Connid string
-	C      net.Conn
+	Con    net.Conn
 }
 
 func init() {
@@ -51,35 +51,33 @@ func WriteMap(key string, value Connection) {
 	defer mutex.Unlock()
 	userMap[key] = value
 	connMap[value.Connid] = key
-	applog.Info.Println("Cinnection id:",value.Connid ,"|","User name:",key)
+	applog.Info.Println("Cinnection id:", value.Connid, "|", "User name:", key)
 }
-
 
 func DeleteFromConnMap(cid string) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	v, ok := connMap[cid]
 	if !ok {
-		applog.Warning.Println(" Connection value not in map:",cid)
+		applog.Warning.Println(" Connection value not in map:", cid)
 		return
 	}
 	delete(connMap, cid)
 	_, ok = userMap[v]
 	if !ok {
-		applog.Warning.Println("User value not in map:",v)
+		applog.Warning.Println("User value not in map:", v)
 		return
 	}
-	userMap[v].C.Close()
+	userMap[v].Con.Close()
 	delete(userMap, v)
-	applog.Info.Println("Cinnection id:",cid ,"|","User name:",v)
+	applog.Info.Println("Cinnection id:", cid, "|", "User name:", v)
 
 }
-
 
 func ReadKey(key string) (Connection, bool) {
 	mutex.RLock()
 	defer mutex.RUnlock()
-	applog.Info.Println("Requesting key:",key)
+	applog.Info.Println("Requesting key:", key)
 	c, ok := userMap[key]
 	return c, ok
 }
@@ -89,12 +87,12 @@ func DeleteFromMap(key string) {
 	defer mutex.Unlock()
 	_, ok := userMap[key]
 	if !ok {
-		applog.Warning.Println("User value not in map:",key)
+		applog.Warning.Println("User value not in map:", key)
 		return
 	}
-	userMap[key].C.Close()
-	applog.Info.Println("Cinnection id:",userMap[key].Connid ,"|","User name:",key)
-	delete(connMap,userMap[key].Connid)
+	userMap[key].Con.Close()
+	applog.Info.Println("Cinnection id:", userMap[key].Connid, "|", "User name:", key)
+	delete(connMap, userMap[key].Connid)
 	delete(userMap, key)
 
 }
@@ -104,10 +102,10 @@ func ClearMap() {
 	defer mutex.Unlock()
 
 	for k, v := range userMap {
-		if v.C != nil {
-			v.C.Close()
+		if v.Con != nil {
+			v.Con.Close()
 		}
-		applog.Info.Println("Clearing map","Cinnection id:",v.Connid ,"|","User name:",k)
+		applog.Info.Println("Clearing map", "Cinnection id:", v.Connid, "|", "User name:", k)
 		delete(userMap, k)
 		delete(connMap, v.Connid)
 	}

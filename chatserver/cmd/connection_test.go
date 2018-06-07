@@ -2,16 +2,15 @@ package cmd
 
 import (
 	"Relay-chat/chatserver/model"
-	"testing"
-	"net"
+	"Relay-chat/chatserver/processors"
 	"encoding/json"
 	"fmt"
-	"Relay-chat/chatserver/processors"
+	"net"
+	"testing"
 
 	"sync"
 	"time"
 )
-
 
 func Decoder(c net.Conn) {
 	dec := json.NewDecoder(c)
@@ -19,29 +18,26 @@ func Decoder(c net.Conn) {
 		m := model.CommonMessage{}
 		e := dec.Decode(&m)
 		if e == nil {
-			fmt.Println(m.Msg.From , m.Msg.To , m.Msg.Data)
+			fmt.Println(m.Msg.From, m.Msg.To, m.Msg.Data)
 		}
 
 	}
 }
 
-
-
-
 func TestHandleConnections(t *testing.T) {
 
-	users := make([]string,1000)
-	cid := make([]string,10000)
-	conn := make([]net.Conn,10000)
+	users := make([]string, 2)
+	cid := make([]string, 10000)
+	conn := make([]net.Conn, 10000)
 	var wg sync.WaitGroup
 
-	for i,_ := range users {
+	for i, _ := range users {
 
 		//wg.Add(1)
-		 func(i int) {
+		func(i int) {
 			//defer wg.Done()
 			users[i] = processors.GenerateConnectinId()
-			c,e := net.Dial("tcp","localhost:6789")
+			c, e := net.Dial("tcp", "localhost:6789")
 			if e != nil {
 				fmt.Print(e.Error())
 				t.Fail()
@@ -55,7 +51,7 @@ func TestHandleConnections(t *testing.T) {
 
 			cid[i] = m.Conn
 
-			 fmt.Println(m.Conn)
+			fmt.Println(m.Conn)
 			m.Lgin = &model.Login{}
 			m.Lgin.UserName = users[i]
 			enc.Encode(&m)
@@ -64,13 +60,13 @@ func TestHandleConnections(t *testing.T) {
 		}(i)
 	}
 
-	time.Sleep(time.Second*5)
+	time.Sleep(time.Second * 5)
 
-	for i,_ := range users {
+	for i, _ := range users {
 
-		for j,_ := range users {
+		for j, _ := range users {
 			wg.Add(1)
-			 go func(i , j int) {
+			go func(i, j int) {
 				defer wg.Done()
 				if i == j {
 					return
@@ -83,21 +79,20 @@ func TestHandleConnections(t *testing.T) {
 				m.Msg.From = users[i]
 				m.Msg.To = users[j]
 				enc.Encode(&m)
-			}(i,j)
+			}(i, j)
 
 		}
 
 	}
 	wg.Wait()
 
-	time.Sleep(time.Second*5)
+	time.Sleep(time.Second * 5)
 
-	for i,_ := range users {
+	for i, _ := range users {
 		if conn[i] != nil {
 			conn[i].Close()
 		}
 
 	}
-
 
 }

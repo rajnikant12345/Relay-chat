@@ -14,6 +14,6 @@ func GenerateReference() string {
 }
 
 func GenerateConnectinId() string {
-	p,_ := uuid.NewRandom()
+	p, _ := uuid.NewRandom()
 	return p.String()
 }

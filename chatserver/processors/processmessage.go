@@ -1,16 +1,15 @@
 package processors
 
 import (
+	"Relay-chat/chatserver/applog"
 	"Relay-chat/chatserver/model"
 	"encoding/json"
 	"io"
 	"net"
-	"Relay-chat/chatserver/applog"
 )
 
 const fail = "-1"
 const loginsuccess = "0"
-
 
 func GetProcessor(message model.CommonMessage) Processor {
 	applog.Info.Println("Getting message processor")
@@ -28,7 +27,7 @@ func GetProcessor(message model.CommonMessage) Processor {
 }
 
 func WriteMessage(c net.Conn, m model.CommonMessage, msg string, from, to string) {
-	applog.Info.Println("WriteMessage","From:",from,"To:",to,"Message:",msg)
+	applog.Info.Println("WriteMessage", "From:", from, "To:", to, "Message:", msg)
 	encoder := json.NewEncoder(c)
 	message := model.Message{}
 	message.Data = msg

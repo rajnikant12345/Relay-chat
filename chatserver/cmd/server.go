@@ -1,16 +1,16 @@
 package cmd
 
 import (
-	"crypto/tls"
+	"Relay-chat/chatserver/applog"
 	"Relay-chat/chatserver/config"
 	"Relay-chat/chatserver/model"
 	"Relay-chat/chatserver/processors"
+	"crypto/tls"
 	"encoding/json"
 	"log"
 	"net"
 	"os"
 	"os/signal"
-	"Relay-chat/chatserver/applog"
 )
 
 func BeginTLS(key, cert, port string) (net.Listener, error) {
@@ -80,7 +80,7 @@ func StartServer() {
 		e = enc.Encode(&m)
 		if e != nil {
 
-			applog.Error.Println("Accept Loop",e.Error())
+			applog.Error.Println("Accept Loop", e.Error())
 			continue
 		}
 		go HandleConnections(c, m.Conn)

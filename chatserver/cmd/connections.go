@@ -1,13 +1,13 @@
 package cmd
 
 import (
+	"Relay-chat/chatserver/applog"
+	"Relay-chat/chatserver/config"
 	"Relay-chat/chatserver/model"
 	"Relay-chat/chatserver/processors"
 	"encoding/json"
 	"io"
 	"net"
-	"Relay-chat/chatserver/applog"
-	"Relay-chat/chatserver/config"
 )
 
 type channelData struct {
@@ -18,8 +18,8 @@ type channelData struct {
 func processMessage(ch chan channelData) {
 	for m := range ch {
 		p := processors.GetProcessor(m.m)
-		if p!= nil {
-			p.ProcessMessage(m.m , m.encoder)
+		if p != nil {
+			p.ProcessMessage(m.m, m.encoder)
 		}
 	}
 }
@@ -51,14 +51,14 @@ func HandleConnections(c net.Conn, conn string) {
 				model.DeleteFromConnMap(conn)
 				return
 			} else {
-				applog.Warning.Println("Terminating connection for", conn,"ERROR:", e.Error())
+				applog.Warning.Println("Terminating connection for", conn, "ERROR:", e.Error())
 				model.DeleteFromConnMap(conn)
 				return
 			}
 		}
 		//validate conection id
 		if m.Conn != conn {
-			applog.Error.Println("Expected conid:",conn, "Receive Connid:",m.Conn)
+			applog.Error.Println("Expected conid:", conn, "Receive Connid:", m.Conn)
 			c.Close()
 			break
 		}

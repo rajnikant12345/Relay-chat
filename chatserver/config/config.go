@@ -33,7 +33,6 @@ func GetConfig(file string) (Config, error) {
 	return CFG, nil
 }
 
-
 func init() {
 	GetConfig(os.Getenv("APP_CFG"))
 }

@@ -1,10 +1,10 @@
 package applog
 
 import (
-	"log"
-	"io/ioutil"
-	"os"
 	"Relay-chat/chatserver/config"
+	"io/ioutil"
+	"log"
+	"os"
 )
 
 var (
@@ -18,7 +18,7 @@ func init() {
 
 	level := config.CFG.Loglevel
 
-	flag := log.Ldate|log.Ltime|log.Lshortfile
+	flag := log.Ldate | log.Ltime | log.Lshortfile
 
 	Warning = log.New(os.Stdout,
 		"WARNING: ",
@@ -48,5 +48,3 @@ func init() {
 	}
 
 }
-
-
