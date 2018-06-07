@@ -1,0 +1,17 @@
+{
+  "messages":
+  [
+    {
+      "login":{
+        "username":"name",
+        "password":"password"
+      }
+    },
+    {
+      "message":{
+        "from":"name",
+        "to":"name"
+      }
+    }
+  ]
+}

@@ -3,7 +3,7 @@ package model
 import (
 	"net"
 	"sync"
-	"cryptolessons/chatserver/applog"
+	"Relay-chat/chatserver/applog"
 )
 
 type CommonMessage struct {

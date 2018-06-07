@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cryptolessons/chatserver/cmd"
+	"Relay-chat/chatserver/cmd"
 	"log"
 )
 

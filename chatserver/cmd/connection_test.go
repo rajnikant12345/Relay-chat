@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"cryptolessons/chatserver/model"
+	"Relay-chat/chatserver/model"
 	"testing"
 	"net"
 	"encoding/json"
 	"fmt"
-	"cryptolessons/chatserver/processors"
+	"Relay-chat/chatserver/processors"
 
 	"sync"
 	"time"
@@ -30,7 +30,7 @@ func Decoder(c net.Conn) {
 
 func TestHandleConnections(t *testing.T) {
 
-	users := make([]string,2)
+	users := make([]string,1000)
 	cid := make([]string,10000)
 	conn := make([]net.Conn,10000)
 	var wg sync.WaitGroup
@@ -63,6 +63,8 @@ func TestHandleConnections(t *testing.T) {
 			go Decoder(c)
 		}(i)
 	}
+
+	time.Sleep(time.Second*5)
 
 	for i,_ := range users {
 

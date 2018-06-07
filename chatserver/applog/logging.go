@@ -4,7 +4,7 @@ import (
 	"log"
 	"io/ioutil"
 	"os"
-	"cryptolessons/chatserver/config"
+	"Relay-chat/chatserver/config"
 )
 
 var (
@@ -18,7 +18,7 @@ func init() {
 
 	level := config.CFG.Loglevel
 
-	flag := log.Ldate|log.Ltime|log.Llongfile
+	flag := log.Ldate|log.Ltime|log.Lshortfile
 
 	Warning = log.New(os.Stdout,
 		"WARNING: ",

@@ -2,15 +2,15 @@ package cmd
 
 import (
 	"crypto/tls"
-	"cryptolessons/chatserver/config"
-	"cryptolessons/chatserver/model"
-	"cryptolessons/chatserver/processors"
+	"Relay-chat/chatserver/config"
+	"Relay-chat/chatserver/model"
+	"Relay-chat/chatserver/processors"
 	"encoding/json"
 	"log"
 	"net"
 	"os"
 	"os/signal"
-	"cryptolessons/chatserver/applog"
+	"Relay-chat/chatserver/applog"
 )
 
 func BeginTLS(key, cert, port string) (net.Listener, error) {

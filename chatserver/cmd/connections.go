@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"cryptolessons/chatserver/model"
-	"cryptolessons/chatserver/processors"
+	"Relay-chat/chatserver/model"
+	"Relay-chat/chatserver/processors"
 	"encoding/json"
 	"io"
 	"net"
-	"cryptolessons/chatserver/applog"
-	"cryptolessons/chatserver/config"
+	"Relay-chat/chatserver/applog"
+	"Relay-chat/chatserver/config"
 )
 
 type channelData struct {
@@ -17,7 +17,10 @@ type channelData struct {
 
 func processMessage(ch chan channelData) {
 	for m := range ch {
-		processors.ProcessMessage(m.m, m.encoder)
+		p := processors.GetProcessor(m.m)
+		if p!= nil {
+			p.ProcessMessage(m.m , m.encoder)
+		}
 	}
 }
 
